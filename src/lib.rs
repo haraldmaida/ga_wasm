@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
 
-extern crate rand;
 use genevo::{operator::prelude::*, prelude::*};
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -10,18 +9,17 @@ use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, Document, HtmlCanvasElement, Window};
 
 mod tsp;
-use tsp::{City, Sequence, RandomSequence, TSP, RenderSequence};
+use tsp::{City, RandomSequence, RenderSequence, Sequence, TSP};
 
 pub const WIDTH: f64 = 1000.0;
 pub const HEIGHT: f64 = 1000.0;
 pub const N_CITIES: usize = 50;
-pub const N_POPULATION: usize = 40;
+pub const N_POPULATION: usize = 64;
 pub const N_INDIVIDUALS_PER_PARENTS: usize = 3;
 pub const SELECTION_RATIO: f64 = 0.7;
 pub const MUTATION_RATE: f64 = 0.05;
 pub const REINSERTION_RATIO: f64 = 0.7;
 pub const GENERATION_LIMIT: u64 = 1000;
-
 
 fn window() -> Window {
     web_sys::window().expect("no global `window` exists")
@@ -83,13 +81,14 @@ pub fn main_js() -> Result<(), JsValue> {
     let mut tsp_sim = simulate(
         genetic_algorithm()
             .with_evaluation(&(*STATIC_TSP))
-            .with_selection(RouletteWheelSelector::new(
-                SELECTION_RATIO,
-                N_CITIES,
-            ))
+            .with_selection(RouletteWheelSelector::new(SELECTION_RATIO, N_CITIES))
             .with_crossover(OrderOneCrossover::new())
             .with_mutation(SwapOrderMutator::new(MUTATION_RATE))
-            .with_reinsertion(ElitistReinserter::new(&(*STATIC_TSP), false, REINSERTION_RATIO))
+            .with_reinsertion(ElitistReinserter::new(
+                &(*STATIC_TSP),
+                false,
+                REINSERTION_RATIO,
+            ))
             .with_initial_population(initial_population)
             .build(),
     )
@@ -101,13 +100,17 @@ pub fn main_js() -> Result<(), JsValue> {
             Ok(SimResult::Intermediate(step)) => {
                 context.clear_rect(0.0, 0.0, WIDTH, HEIGHT);
                 (*STATIC_TSP).render(&context);
-                
+
                 context.set_font("Bold 48px serif");
                 context.set_fill_style(&"blue".into());
-                context.fill_text(&format!("Iteration: {}", step.iteration), 100.0, 100.0).unwrap();
+                context
+                    .fill_text(&format!("Iteration: {}", step.iteration), 100.0, 100.0)
+                    .unwrap();
                 let best_solution = step.result.best_solution.solution;
                 context.set_fill_style(&"grey".into());
-                context.fill_text(&format!("Fitness: {}", best_solution.fitness), 100.0, 200.0).unwrap();
+                context
+                    .fill_text(&format!("Fitness: {}", best_solution.fitness), 100.0, 200.0)
+                    .unwrap();
                 let dna = best_solution.genome;
                 dna.render(&(*STATIC_TSP).cities, &context);
             }
@@ -120,7 +123,7 @@ pub fn main_js() -> Result<(), JsValue> {
         }
         if !finished {
             request_animation_frame(f.borrow().as_ref().unwrap());
-        }else{
+        } else {
             return;
         }
     }) as Box<dyn FnMut()>));

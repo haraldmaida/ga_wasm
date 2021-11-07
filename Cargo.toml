@@ -1,8 +1,8 @@
 # You must change these to your own details.
 [package]
-name = "rust-webpack-template"
-description = "My super awesome Rust, WebAssembly, and Webpack project!"
-version = "0.1.0"
+name = "ga-wasm"
+description = "GA and WASM - TSP Demo"
+version = "0.2.0"
 authors = ["You <you@example.com>"]
 categories = ["wasm"]
 readme = "README.md"
@@ -23,24 +23,22 @@ lto = true
 [dependencies]
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
 # to interact with JavaScript.
-wasm-bindgen = "0.2.45"
+wasm-bindgen = "0.2"
 
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. However, it is slower than the default
 # allocator, so it's not enabled by default.
 wee_alloc = { version = "0.4.2", optional = true }
-js-sys = "0.3.35"
-stdweb = "0.4.20"
-rand = { version = "0.7.3", features = ["wasm-bindgen"] }
-genevo = "0.5.0"
-lazy_static = "1.4.0"
-
-
+js-sys = "0.3"
+stdweb = "0.4"
+rand = "0.8"
+genevo = { version = "0.7", features = ["wasm-bindgen"] }
+lazy_static = "1"
 
 # The `web-sys` crate allows you to interact with the various browser APIs,
 # like the DOM.
 [dependencies.web-sys]
-version = "0.3.22"
+version = "0.3"
 features = [
     "CanvasRenderingContext2d",
     "Document",
@@ -55,15 +53,11 @@ features = [
 # all the `std::fmt` and `std::panicking` infrastructure, so it's only enabled
 # in debug mode.
 [target."cfg(debug_assertions)".dependencies]
-console_error_panic_hook = "0.1.5"
+console_error_panic_hook = "0.1"
 
 # These crates are used for running unit tests.
 [dev-dependencies]
-wasm-bindgen-test = "0.2.45"
-futures = "0.1.27"
-js-sys = "0.3.22"
-wasm-bindgen-futures = "0.3.22"
-
-[replace]
-"genevo:0.5.0" = { path = 'vendor/genevo' }
-"time:0.1.42" = { path = 'vendor/time' }
+wasm-bindgen-test = "0.2"
+futures = "0.1"
+js-sys = "0.3"
+wasm-bindgen-futures = "0.3"
